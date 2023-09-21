@@ -1,15 +1,14 @@
-package br.com.sanittas.app.model;
+package br.com.sanittas.app.service.usuario.dto;
 
-import jakarta.persistence.*;
+import br.com.sanittas.app.model.Endereco;
+import jakarta.persistence.Embedded;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import org.hibernate.validator.constraints.br.CPF;
 
-@Entity(name="Usuario")
-public class Usuario {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class UsuarioCriacaoDto {
     @NotBlank
     private String nome;
     @Email
@@ -20,29 +19,15 @@ public class Usuario {
     private String celular;
     @NotBlank
     private String senha;
-    @Embedded
+    @NotNull
     private Endereco endereco;
-
-    public Usuario() {
-
-    }
-
-    public Usuario(Long id, String nome, String email, String cpf, String celular, String senha, Endereco endereco) {
-        this.id = id;
-        this.nome = nome;
-        this.email = email;
-        this.cpf = cpf;
-        this.celular = celular;
-        this.senha = senha;
-        this.endereco = endereco;
-    }
-
-    public Long getId() {
-        return id;
-    }
 
     public String getNome() {
         return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getEmail() {
@@ -57,32 +42,28 @@ public class Usuario {
         return cpf;
     }
 
-    public String getCelular() {
-        return celular;
-    }
-
-    public String getSenha() {
-        return senha;
-    }
-
-    public Endereco getEndereco() {
-        return endereco;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
     public void setCpf(String cpf) {
         this.cpf = cpf;
+    }
+
+    public String getCelular() {
+        return celular;
     }
 
     public void setCelular(String celular) {
         this.celular = celular;
     }
 
+    public String getSenha() {
+        return senha;
+    }
+
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public Endereco getEndereco() {
+        return endereco;
     }
 
     public void setEndereco(Endereco endereco) {

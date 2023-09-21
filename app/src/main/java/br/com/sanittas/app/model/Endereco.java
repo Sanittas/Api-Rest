@@ -1,13 +1,12 @@
 package br.com.sanittas.app.model;
 
-import br.com.sanittas.app.controller.request.DadosEndereco;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
 
 @Embeddable
 public class Endereco {
     @NotBlank
-    private String rua;
+    private String logradouro;
     @NotBlank
     private String numero;
     private String complemento;
@@ -20,20 +19,20 @@ public class Endereco {
 
     }
 
-    public Endereco(DadosEndereco dados) {
-        this.rua = dados.rua();
-        this.numero = dados.numero();
-        this.complemento = dados.complemento();
-        this.estado = dados.estado();
-        this.cidade = dados.cidade();
+    public Endereco(String logradouro, String numero, String complemento, String estado, String cidade) {
+        this.logradouro = logradouro;
+        this.numero = numero;
+        this.complemento = complemento;
+        this.estado = estado;
+        this.cidade = cidade;
     }
 
     public String getRua() {
-        return rua;
+        return logradouro;
     }
 
     public void setRua(String rua) {
-        this.rua = rua;
+        this.logradouro = rua;
     }
 
     public String getNumero() {

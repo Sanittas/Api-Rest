@@ -1,9 +1,12 @@
 package br.com.sanittas.app.controller;
 
-import br.com.sanittas.app.controller.request.DadosUsuario;
 import br.com.sanittas.app.exception.ValidacaoException;
 import br.com.sanittas.app.model.Usuario;
-import br.com.sanittas.app.services.UsuarioServices;
+import br.com.sanittas.app.service.UsuarioServices;
+import br.com.sanittas.app.service.autenticacao.dto.UsuarioLoginDto;
+import br.com.sanittas.app.service.autenticacao.dto.UsuarioTokenDto;
+import br.com.sanittas.app.service.usuario.dto.UsuarioCriacaoDto;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,12 +14,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/usuario")
+@RequestMapping("/usuarios")
 public class UsuarioController {
-
     @Autowired
     private UsuarioServices services;
 
+    @PostMapping("/login")
+    public ResponseEntity<UsuarioTokenDto> login(@RequestBody UsuarioLoginDto usuarioLoginDto) {
+        UsuarioTokenDto usuarioTokenDto = services.autenticar(usuarioLoginDto);
+        return ResponseEntity.status(200).body(usuarioTokenDto);
+    }
     @GetMapping("/")
     public ResponseEntity<List<Usuario>> listar() {
        var response = services.listarUsuarios();
@@ -37,17 +44,17 @@ public class UsuarioController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Usuario> cadastrar(@RequestBody DadosUsuario dados) {
+    public ResponseEntity<Void> cadastrar(@RequestBody @Valid UsuarioCriacaoDto dados) {
         try{
-            var usuario = services.cadastrar(dados);
-            return ResponseEntity.status(201).body(usuario);
+            services.cadastrar(dados);
+            return ResponseEntity.status(201).build();
         }catch (Exception e){
             return ResponseEntity.status(400).build();
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody DadosUsuario dados) {
+    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody @Valid Usuario dados) {
         try{
             var usuario = services.atualizar(id,dados);
             return ResponseEntity.status(200).body(usuario);
