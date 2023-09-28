@@ -13,7 +13,6 @@ public class UsuarioMapper {
         usuario.setSenha(usuarioCriacaoDto.getSenha());
         usuario.setCpf(usuarioCriacaoDto.getCpf());
         usuario.setCelular(usuarioCriacaoDto.getCelular());
-        usuario.setEndereco(usuarioCriacaoDto.getEndereco());
 
         return usuario;
     }

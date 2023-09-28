@@ -2,10 +2,14 @@ package br.com.sanittas.app.service;
 
 import br.com.sanittas.app.api.configuration.security.jwt.GerenciadorTokenJwt;
 import br.com.sanittas.app.exception.ValidacaoException;
+import br.com.sanittas.app.model.Endereco;
 import br.com.sanittas.app.model.Usuario;
 import br.com.sanittas.app.repository.UsuarioRepository;
 import br.com.sanittas.app.service.autenticacao.dto.UsuarioLoginDto;
 import br.com.sanittas.app.service.autenticacao.dto.UsuarioTokenDto;
+import br.com.sanittas.app.service.endereco.dto.ListaEndereco;
+import br.com.sanittas.app.service.usuario.dto.ListaUsuario;
+import br.com.sanittas.app.service.usuario.dto.ListaUsuarioAtualizacao;
 import br.com.sanittas.app.service.usuario.dto.UsuarioCriacaoDto;
 import br.com.sanittas.app.service.usuario.dto.UsuarioMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,8 +34,35 @@ public class UsuarioServices {
     private GerenciadorTokenJwt gerenciadorTokenJwt;
     @Autowired
     private AuthenticationManager authenticationManager;
-    public List<Usuario> listarUsuarios() {
-        return repository.findAll();
+
+    public List<ListaUsuario> listarUsuarios() {
+        var usuarios = repository.findAll();
+        List<ListaUsuario> listaUsuarios = new ArrayList<>();
+        for (Usuario usuario : usuarios) {
+            List<ListaEndereco> listaEnderecos = new ArrayList<>();
+            for(Endereco endereco : usuario.getEnderecos()){
+                       var enderecoDto = new ListaEndereco(
+                               endereco.getId(),
+                               endereco.getLogradouro(),
+                               endereco.getNumero(),
+                               endereco.getComplemento(),
+                               endereco.getEstado(),
+                               endereco.getCidade()
+                       );
+                          listaEnderecos.add(enderecoDto);
+            }
+            var usuarioDto = new ListaUsuario(
+                    usuario.getId(),
+                    usuario.getNome(),
+                    usuario.getEmail(),
+                    usuario.getCpf(),
+                    usuario.getCelular(),
+                    usuario.getSenha(),
+                    listaEnderecos
+            );
+            listaUsuarios.add(usuarioDto);
+        }
+        return listaUsuarios;
     }
 
     public void cadastrar(UsuarioCriacaoDto usuarioCriacaoDto) {
@@ -61,7 +92,7 @@ public class UsuarioServices {
         return UsuarioMapper.of(usuarioAutenticado, token);
     }
 
-    public Usuario atualizar(Long id, Usuario dados) {
+    public ListaUsuarioAtualizacao atualizar(Long id, Usuario dados) {
         var usuario = repository.findById(id);
         if (usuario.isPresent()){
             usuario.get().setNome(dados.getNome());
@@ -69,9 +100,16 @@ public class UsuarioServices {
             usuario.get().setCpf(dados.getCpf());
             usuario.get().setCelular(dados.getCelular());
             usuario.get().setSenha(dados.getSenha());
-            usuario.get().setEndereco(dados.getEndereco());
+            ListaUsuarioAtualizacao usuarioDto = new ListaUsuarioAtualizacao(
+                    usuario.get().getId(),
+                    usuario.get().getNome(),
+                    usuario.get().getEmail(),
+                    usuario.get().getCpf(),
+                    usuario.get().getCelular(),
+                    usuario.get().getSenha()
+            );
             repository.save(usuario.get());
-            return usuario.get();
+            return usuarioDto;
         }
         return null;
     }
@@ -83,11 +121,32 @@ public class UsuarioServices {
         repository.deleteById(id);
     }
 
-    public Usuario buscar(Long id) {
+    public ListaUsuario buscar(Long id) {
         var usuario = repository.findById(id);
         if (usuario.isEmpty()) {
             throw new ValidacaoException("Usuário não existe!");
         }
-        return usuario.get();
+            List<ListaEndereco> listaEnderecos = new ArrayList<>();
+            for(Endereco endereco : usuario.get().getEnderecos()){
+                var enderecoDto = new ListaEndereco(
+                        endereco.getId(),
+                        endereco.getLogradouro(),
+                        endereco.getNumero(),
+                        endereco.getComplemento(),
+                        endereco.getEstado(),
+                        endereco.getCidade()
+                );
+                listaEnderecos.add(enderecoDto);
+            }
+            ListaUsuario usuarioDto = new ListaUsuario(
+                    usuario.get().getId(),
+                    usuario.get().getNome(),
+                    usuario.get().getEmail(),
+                    usuario.get().getCpf(),
+                    usuario.get().getCelular(),
+                    usuario.get().getSenha(),
+                    listaEnderecos
+            );
+        return usuarioDto;
     }
 }

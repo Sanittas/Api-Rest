@@ -5,6 +5,7 @@ import br.com.sanittas.app.model.Usuario;
 import br.com.sanittas.app.service.UsuarioServices;
 import br.com.sanittas.app.service.autenticacao.dto.UsuarioLoginDto;
 import br.com.sanittas.app.service.autenticacao.dto.UsuarioTokenDto;
+import br.com.sanittas.app.service.usuario.dto.ListaUsuario;
 import br.com.sanittas.app.service.usuario.dto.UsuarioCriacaoDto;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +26,16 @@ public class UsuarioController {
         return ResponseEntity.status(200).body(usuarioTokenDto);
     }
     @GetMapping("/")
-    public ResponseEntity<List<Usuario>> listar() {
-       var response = services.listarUsuarios();
-       if (!response.isEmpty()){
-           return ResponseEntity.status(200).body(response);
-       }
-       return ResponseEntity.status(204).build();
+    public ResponseEntity<List<ListaUsuario>> listar() {
+        try{
+            var response = services.listarUsuarios();
+            if (!response.isEmpty()){
+                return ResponseEntity.status(200).body(response);
+            }
+            return ResponseEntity.status(204).build();
+        }catch (Exception e) {
+            throw new RuntimeException(e.getLocalizedMessage());
+        }
     }
 
     @GetMapping("/{id}")

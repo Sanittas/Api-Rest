@@ -1,10 +1,15 @@
 package br.com.sanittas.app.model;
 
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
-@Embeddable
+@Entity(name="Endereco")
+@Table(name = "endereco")
 public class Endereco {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @ManyToOne
+    private Usuario usuario;
     @NotBlank
     private String logradouro;
     @NotBlank
@@ -15,23 +20,23 @@ public class Endereco {
     @NotBlank
     private String cidade;
 
-    public Endereco() {
-
+    public Long getId() {
+        return id;
     }
 
-    public Endereco(String logradouro, String numero, String complemento, String estado, String cidade) {
-        this.logradouro = logradouro;
-        this.numero = numero;
-        this.complemento = complemento;
-        this.estado = estado;
-        this.cidade = cidade;
+    public Usuario getUsuario() {
+        return usuario;
     }
 
-    public String getRua() {
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public String getLogradouro() {
         return logradouro;
     }
 
-    public void setRua(String rua) {
+    public void setLogradouro(String rua) {
         this.logradouro = rua;
     }
 

@@ -6,7 +6,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import org.hibernate.validator.constraints.br.CPF;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity(name="Usuario")
+@Table(name = "usuario")
 public class Usuario {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,22 +24,9 @@ public class Usuario {
     private String celular;
     @NotBlank
     private String senha;
-    @Embedded
-    private Endereco endereco;
+    @OneToMany(mappedBy = "usuario",orphanRemoval = true)
+    private List<Endereco> enderecos = new ArrayList<>();
 
-    public Usuario() {
-
-    }
-
-    public Usuario(Long id, String nome, String email, String cpf, String celular, String senha, Endereco endereco) {
-        this.id = id;
-        this.nome = nome;
-        this.email = email;
-        this.cpf = cpf;
-        this.celular = celular;
-        this.senha = senha;
-        this.endereco = endereco;
-    }
 
     public Long getId() {
         return id;
@@ -65,10 +56,6 @@ public class Usuario {
         return senha;
     }
 
-    public Endereco getEndereco() {
-        return endereco;
-    }
-
     public void setNome(String nome) {
         this.nome = nome;
     }
@@ -85,7 +72,11 @@ public class Usuario {
         this.senha = senha;
     }
 
-    public void setEndereco(Endereco endereco) {
-        this.endereco = endereco;
+    public List<Endereco> getEnderecos() {
+        return enderecos;
+    }
+
+    public void setEnderecos(List<Endereco> enderecos) {
+        this.enderecos = enderecos;
     }
 }
