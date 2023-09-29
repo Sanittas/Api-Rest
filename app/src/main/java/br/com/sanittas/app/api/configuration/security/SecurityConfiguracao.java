@@ -2,6 +2,7 @@ package br.com.sanittas.app.api.configuration.security;
 
 import br.com.sanittas.app.api.configuration.security.jwt.GerenciadorTokenJwt;
 import br.com.sanittas.app.service.autenticacao.dto.AutenticacaoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,9 +14,11 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -27,12 +30,14 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfiguracao {
     private static final String ORIGENS_PERMITIDAS = "*";
     @Autowired
     private AutenticacaoService autenticacaoService;
     @Autowired
-    private  AutenticacaoEntryPoint autenticacaoEntryPoint;
+    private AutenticacaoEntryPoint autenticacaoEntryPoint;
+    private final LogoutHandler logoutHandler;
 
     private static final AntPathRequestMatcher[] URLS_PERMITIDAS = {
             new AntPathRequestMatcher("/swagger-ui/**"),
@@ -54,7 +59,8 @@ public class SecurityConfiguracao {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.headers()
+        http.
+                headers()
                 .frameOptions().disable()
                 .and()
                 .cors()
@@ -70,9 +76,13 @@ public class SecurityConfiguracao {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-                http.addFilterBefore(jwtAuthenticationFilterBean(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilterBean(), UsernamePasswordAuthenticationFilter.class)
+                .logout()
+                .logoutUrl("/usuarios/logout")
+                .addLogoutHandler(logoutHandler)
+                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext());
 
-                return http.build();
+        return http.build();
     }
 
     @Bean
@@ -119,7 +129,7 @@ public class SecurityConfiguracao {
                         HttpMethod.TRACE.name()
                 ));
 
-                configuracao.setExposedHeaders(List.of(HttpHeaders.CONTENT_DISPOSITION));
+        configuracao.setExposedHeaders(List.of(HttpHeaders.CONTENT_DISPOSITION));
 
         UrlBasedCorsConfigurationSource origem = new UrlBasedCorsConfigurationSource();
         origem.registerCorsConfiguration("/**", configuracao);

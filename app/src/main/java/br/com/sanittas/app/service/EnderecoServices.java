@@ -22,7 +22,7 @@ public class EnderecoServices {
     private UsuarioRepository usuarioRepository;
 
 
-    public List<ListaEndereco> listarEnderecosPorUsuario(Long idUsuario) {
+    public List<ListaEndereco> listarEnderecosPorUsuario(Integer idUsuario) {
         var usuario = usuarioRepository.findById(idUsuario);
         List<ListaEndereco> enderecos = new ArrayList<>();
         if (usuario.isPresent()){
@@ -42,7 +42,7 @@ public class EnderecoServices {
         throw new ValidacaoException("Usuário não encontrado");
     }
 
-    public void cadastrar(EnderecoCriacaoDto enderecoCriacaoDto,Long usuario_id) {
+    public void cadastrar(EnderecoCriacaoDto enderecoCriacaoDto,Integer usuario_id) {
         var endereco = EnderecoMapper.of(enderecoCriacaoDto);
         var usuario = usuarioRepository.findById(usuario_id);
             endereco.setUsuario(usuario.get());

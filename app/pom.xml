@@ -77,6 +77,13 @@
 			<artifactId>jjwt-impl</artifactId>
 			<version>0.11.2</version> <!-- Use a versão mais recente disponível -->
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.24</version>
+			<scope>provided</scope>
+		</dependency>
 
 
 	</dependencies>

@@ -5,7 +5,7 @@ import br.com.sanittas.app.service.endereco.dto.ListaEndereco;
 import java.util.List;
 
 public record ListaUsuario(
-        Long id,
+        Integer id,
         String nome,
         String email,
         String cpf,

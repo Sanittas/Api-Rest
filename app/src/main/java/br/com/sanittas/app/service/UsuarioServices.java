@@ -1,6 +1,9 @@
 package br.com.sanittas.app.service;
 
 import br.com.sanittas.app.api.configuration.security.jwt.GerenciadorTokenJwt;
+import br.com.sanittas.app.api.configuration.security.token.Token;
+import br.com.sanittas.app.api.configuration.security.token.TokenRepository;
+import br.com.sanittas.app.api.configuration.security.token.TokenType;
 import br.com.sanittas.app.exception.ValidacaoException;
 import br.com.sanittas.app.model.Endereco;
 import br.com.sanittas.app.model.Usuario;
@@ -34,6 +37,8 @@ public class UsuarioServices {
     private GerenciadorTokenJwt gerenciadorTokenJwt;
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    private TokenRepository tokenRepository;
 
     public List<ListaUsuario> listarUsuarios() {
         var usuarios = repository.findAll();
@@ -87,12 +92,32 @@ public class UsuarioServices {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        final String token = gerenciadorTokenJwt.generateToken(authentication);
+        final String jwtToken = gerenciadorTokenJwt.generateToken(authentication);
+        var token = Token.builder()
+                .usuario(usuarioAutenticado)
+                .token(jwtToken)
+                .tokenType(TokenType.BEARER)
+                .revoked(false)
+                .expired(false)
+                .build();
+        revokeAllUserTokens(usuarioAutenticado);
+        tokenRepository.save(token);
 
-        return UsuarioMapper.of(usuarioAutenticado, token);
+        return UsuarioMapper.of(usuarioAutenticado, token.getToken());
     }
 
-    public ListaUsuarioAtualizacao atualizar(Long id, Usuario dados) {
+    private void revokeAllUserTokens(Usuario usuario) {
+        var validTokens = tokenRepository.findAllValidTokensByUsuarioId(usuario.getId());
+        if (validTokens.isEmpty())
+            return;
+        validTokens.forEach(t -> {
+            t.setExpired(true);
+            t.setRevoked(true);
+        });
+        tokenRepository.saveAll(validTokens);
+    }
+
+    public ListaUsuarioAtualizacao atualizar(Integer id, Usuario dados) {
         var usuario = repository.findById(id);
         if (usuario.isPresent()){
             usuario.get().setNome(dados.getNome());
@@ -114,14 +139,14 @@ public class UsuarioServices {
         return null;
     }
 
-    public void deletar(Long id) {
+    public void deletar(Integer id) {
         if (!repository.existsById(id)) {
             throw new ValidacaoException("Usuário não existe!");
         }
         repository.deleteById(id);
     }
 
-    public ListaUsuario buscar(Long id) {
+    public ListaUsuario buscar(Integer id) {
         var usuario = repository.findById(id);
         if (usuario.isEmpty()) {
             throw new ValidacaoException("Usuário não existe!");
@@ -148,5 +173,10 @@ public class UsuarioServices {
                     listaEnderecos
             );
         return usuarioDto;
+    }
+
+    public Token recuperarToken(String jwtToken) {
+        return tokenRepository.findByToken(jwtToken)
+                .orElseThrow(() -> new ResponseStatusException(404, "Token não encontrado", null));
     }
 }

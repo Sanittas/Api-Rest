@@ -17,7 +17,7 @@ public class EnderecoController {
     private EnderecoServices services;
 
     @GetMapping("/{id_usuario}")
-    public ResponseEntity<List<ListaEndereco>> listarEnderecosPorUsuario(@PathVariable Long id_usuario) {
+    public ResponseEntity<List<ListaEndereco>> listarEnderecosPorUsuario(@PathVariable Integer id_usuario) {
         try{
             var response = services.listarEnderecosPorUsuario(id_usuario);
             if (!response.isEmpty()) {
@@ -31,7 +31,7 @@ public class EnderecoController {
     }
 
     @PostMapping("/{usuario_id}")
-    public ResponseEntity<Void> cadastrarEndereco(@RequestBody EnderecoCriacaoDto endereco, @PathVariable Long usuario_id) {
+    public ResponseEntity<Void> cadastrarEndereco(@RequestBody EnderecoCriacaoDto endereco, @PathVariable Integer usuario_id) {
         try {
             services.cadastrar(endereco,usuario_id);
             return ResponseEntity.status(201).build();

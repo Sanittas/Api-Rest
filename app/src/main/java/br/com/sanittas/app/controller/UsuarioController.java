@@ -39,7 +39,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> buscar(@PathVariable Long id) {
+    public ResponseEntity<?> buscar(@PathVariable Integer id) {
         try{
             var usuario = services.buscar(id);
             return ResponseEntity.status(200).body(usuario);
@@ -59,7 +59,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody @Valid Usuario dados) {
+    public ResponseEntity<?> atualizar(@PathVariable Integer id, @RequestBody @Valid Usuario dados) {
         try{
             var usuario = services.atualizar(id,dados);
             return ResponseEntity.status(200).body(usuario);
@@ -69,7 +69,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletar(@PathVariable Long id) {
+    public ResponseEntity<?> deletar(@PathVariable Integer id) {
         try{
             services.deletar(id);
             return ResponseEntity.status(200).build();
