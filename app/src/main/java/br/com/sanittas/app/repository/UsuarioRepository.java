@@ -13,7 +13,4 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 
     Optional<Usuario> findByEmail(String username);
 
-//    @Override
-//    @Query(value = "SELECT u FROM Usuario u ")
-//    List<Usuario> findAll();
 }

@@ -1,11 +1,16 @@
 package br.com.sanittas.app.service.autenticacao.dto;
 
 import br.com.sanittas.app.model.Usuario;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
+@Getter
+@Setter
 public class UsuarioDetalhesDto implements UserDetails {
     private final String nome;
     private final String email;
@@ -17,9 +22,6 @@ public class UsuarioDetalhesDto implements UserDetails {
         this.senha = usuario.getSenha();
     }
 
-    public String getNome() {
-        return nome;
-    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

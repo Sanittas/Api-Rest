@@ -1,31 +1,36 @@
-HELP.md
+# Arquivos temporários
+*.class
+*.log
+*.swp
+
+# Arquivos de compilação
 target/
-!.mvn/wrapper/maven-wrapper.jar
+build/
 
-### STS ###
-.apt_generated
+# Arquivos de dependência
+.mvn/
+repository/
+# Se você estiver usando Maven Wrapper (mvnw)
+!/.mvn/wrapper/maven-wrapper.jar
+
+# Arquivos de configuração específicos do IDE (Eclipse, IntelliJ, etc.)
 .classpath
-.factorypath
 .project
-.settings
-.springBeans
-.sts4-cache
+.settings/
 
-### IntelliJ IDEA ###
-.idea
-*.iws
+# Logs e arquivos de configuração do Spring Boot
+logs/
+spring-boot-*.log
+
+# Arquivos gerados pelo IDE
+.idea/
 *.iml
 *.ipr
+*.iws
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
+# Arquivos de configuração do Visual Studio Code (opcional, se você estiver usando o VS Code)
 .vscode/
+
+# Arquivos de configuração do Eclipse (opcional, se você estiver usando o Eclipse)
+.settings/
+bin/

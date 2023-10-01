@@ -30,14 +30,14 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@RequiredArgsConstructor
 public class SecurityConfiguracao {
     private static final String ORIGENS_PERMITIDAS = "*";
     @Autowired
     private AutenticacaoService autenticacaoService;
     @Autowired
     private AutenticacaoEntryPoint autenticacaoEntryPoint;
-    private final LogoutHandler logoutHandler;
+    @Autowired
+    private LogoutHandler logoutHandler;
 
     private static final AntPathRequestMatcher[] URLS_PERMITIDAS = {
             new AntPathRequestMatcher("/swagger-ui/**"),
