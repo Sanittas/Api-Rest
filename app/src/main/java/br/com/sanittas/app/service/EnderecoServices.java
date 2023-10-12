@@ -2,6 +2,7 @@ package br.com.sanittas.app.service;
 
 import br.com.sanittas.app.exception.ValidacaoException;
 import br.com.sanittas.app.model.Endereco;
+import br.com.sanittas.app.repository.EmpresaRepository;
 import br.com.sanittas.app.repository.EnderecoRepository;
 import br.com.sanittas.app.repository.UsuarioRepository;
 import br.com.sanittas.app.service.endereco.dto.EnderecoCriacaoDto;
@@ -20,6 +21,8 @@ public class EnderecoServices {
     private EnderecoRepository repository;
     @Autowired
     private UsuarioRepository usuarioRepository;
+    @Autowired
+    private EmpresaRepository empresaRepository;
 
 
     public List<ListaEndereco> listarEnderecosPorUsuario(Integer idUsuario) {
@@ -42,12 +45,18 @@ public class EnderecoServices {
         throw new ValidacaoException("Usuário não encontrado");
     }
 
-    public void cadastrar(EnderecoCriacaoDto enderecoCriacaoDto,Integer usuario_id) {
+    public void cadastrarEnderecoUsuario(EnderecoCriacaoDto enderecoCriacaoDto,Integer usuario_id) {
         var endereco = EnderecoMapper.of(enderecoCriacaoDto);
         var usuario = usuarioRepository.findById(usuario_id);
             endereco.setUsuario(usuario.get());
             repository.save(endereco);
+    }
 
+    public void cadastrarEnderecoEmpresa(EnderecoCriacaoDto enderecoCriacaoDto,Integer empresa_id) {
+        var endereco = EnderecoMapper.of(enderecoCriacaoDto);
+        var empresa = empresaRepository.findById(empresa_id);
+        endereco.setEmpresa(empresa.get());
+        repository.save(endereco);
     }
 
     public ListaEndereco atualizar(EnderecoCriacaoDto enderecoCriacaoDto, Long id) {
@@ -71,10 +80,32 @@ public class EnderecoServices {
         throw new ValidacaoException("Endereço não encontrado");
     }
 
-    public void deletar(Long id) {
+    public void deletarEndereco(Long id) {
         if (!repository.existsById(id)) {
             throw new ValidacaoException("Endereço não existe!");
         }
         repository.deleteById(id);
     }
+
+    public List<ListaEndereco> listarEnderecosPorEmpresa(Integer idEmpresa) {
+        var empresa = empresaRepository.findById(idEmpresa);
+        List<ListaEndereco> enderecos = new ArrayList<>();
+        if (empresa.isPresent()){
+            for (Endereco endereco : empresa.get().getEnderecos()) {
+                var enderecoDto = new ListaEndereco(
+                        endereco.getId(),
+                        endereco.getLogradouro(),
+                        endereco.getNumero(),
+                        endereco.getComplemento(),
+                        endereco.getEstado(),
+                        endereco.getCidade()
+                );
+                enderecos.add(enderecoDto);
+            }
+            return enderecos;
+        }
+        return null;
+    }
+
+
 }

@@ -14,6 +14,8 @@ public class Endereco {
     private Long id;
     @ManyToOne
     private Usuario usuario;
+    @ManyToOne
+    private Empresa empresa;
     @NotBlank
     private String logradouro;
     @NotBlank

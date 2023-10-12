@@ -1,7 +1,6 @@
 package br.com.sanittas.app.api.configuration.security;
 
 import br.com.sanittas.app.api.configuration.security.jwt.GerenciadorTokenJwt;
-import br.com.sanittas.app.api.configuration.security.token.Token;
 import br.com.sanittas.app.service.UsuarioServices;
 import br.com.sanittas.app.service.autenticacao.dto.AutenticacaoService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -9,7 +8,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,20 +16,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Objects;
 
 
-
 public class AutenticacaoFilter extends OncePerRequestFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(AutenticacaoFilter.class);
     private final AutenticacaoService autenticacaoService;
-    @Autowired
-    private UsuarioServices usuarioServices;
     private final GerenciadorTokenJwt jwtTokenManager;
 
     public AutenticacaoFilter(AutenticacaoService autenticacaoService, GerenciadorTokenJwt jwtTokenManager) {
@@ -41,10 +34,7 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
 
 
     @Override
-    protected void doFilterInternal(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String username = null;
         String jwtToken = null;
 
@@ -53,7 +43,7 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
         if (Objects.nonNull(requestTokenHeader) && requestTokenHeader.startsWith("Bearer ")) {
             jwtToken = requestTokenHeader.substring(7);
 
-            try{
+            try {
                 username = jwtTokenManager.getUsernameFromToken(jwtToken);
             } catch (ExpiredJwtException exception) {
 
@@ -75,9 +65,7 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
 
         UserDetails userDetails = autenticacaoService.loadUserByUsername(username);
 
-        Token token = usuarioServices.recuperarToken(jwtToken);
-
-        if (jwtTokenManager.validateToken(token, userDetails)) {
+        if (jwtTokenManager.validateToken(jwtToken, userDetails)) {
 
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new
                     UsernamePasswordAuthenticationToken(

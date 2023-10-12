@@ -36,8 +36,6 @@ public class SecurityConfiguracao {
     private AutenticacaoService autenticacaoService;
     @Autowired
     private AutenticacaoEntryPoint autenticacaoEntryPoint;
-    @Autowired
-    private LogoutHandler logoutHandler;
 
     private static final AntPathRequestMatcher[] URLS_PERMITIDAS = {
             new AntPathRequestMatcher("/swagger-ui/**"),
@@ -53,8 +51,10 @@ public class SecurityConfiguracao {
             new AntPathRequestMatcher("/actuator/*"),
             new AntPathRequestMatcher("/api/public/**"),
             new AntPathRequestMatcher("/api/public/authenticate"),
-            new AntPathRequestMatcher("/usuarios/login/**")
-//            new AntPathRequestMatcher("/usuarios/**")
+            new AntPathRequestMatcher("/usuarios/login/**"),
+            new AntPathRequestMatcher("/enderecos/**"),
+            new AntPathRequestMatcher("/empresas/**")
+
     };
 
     @Bean
@@ -77,10 +77,7 @@ public class SecurityConfiguracao {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.addFilterBefore(jwtAuthenticationFilterBean(), UsernamePasswordAuthenticationFilter.class)
-                .logout()
-                .logoutUrl("/usuarios/logout")
-                .addLogoutHandler(logoutHandler)
-                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext());
+        ;
 
         return http.build();
     }

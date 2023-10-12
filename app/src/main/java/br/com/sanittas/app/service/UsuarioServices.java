@@ -1,9 +1,6 @@
 package br.com.sanittas.app.service;
 
 import br.com.sanittas.app.api.configuration.security.jwt.GerenciadorTokenJwt;
-import br.com.sanittas.app.api.configuration.security.token.Token;
-import br.com.sanittas.app.api.configuration.security.token.TokenRepository;
-import br.com.sanittas.app.api.configuration.security.token.TokenType;
 import br.com.sanittas.app.exception.ValidacaoException;
 import br.com.sanittas.app.model.Endereco;
 import br.com.sanittas.app.model.Usuario;
@@ -26,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UsuarioServices {
@@ -37,37 +35,43 @@ public class UsuarioServices {
     private GerenciadorTokenJwt gerenciadorTokenJwt;
     @Autowired
     private AuthenticationManager authenticationManager;
-    @Autowired
-    private TokenRepository tokenRepository;
 
     public List<ListaUsuario> listarUsuarios() {
         var usuarios = repository.findAll();
         List<ListaUsuario> listaUsuarios = new ArrayList<>();
         for (Usuario usuario : usuarios) {
             List<ListaEndereco> listaEnderecos = new ArrayList<>();
-            for(Endereco endereco : usuario.getEnderecos()){
-                       var enderecoDto = new ListaEndereco(
-                               endereco.getId(),
-                               endereco.getLogradouro(),
-                               endereco.getNumero(),
-                               endereco.getComplemento(),
-                               endereco.getEstado(),
-                               endereco.getCidade()
-                       );
-                          listaEnderecos.add(enderecoDto);
-            }
-            var usuarioDto = new ListaUsuario(
-                    usuario.getId(),
-                    usuario.getNome(),
-                    usuario.getEmail(),
-                    usuario.getCpf(),
-                    usuario.getCelular(),
-                    usuario.getSenha(),
-                    listaEnderecos
-            );
-            listaUsuarios.add(usuarioDto);
+            criarDtoEndereco(usuario, listaEnderecos);
+            criarDtoUsuarios(usuario, listaEnderecos, listaUsuarios);
         }
         return listaUsuarios;
+    }
+
+    private static void criarDtoUsuarios(Usuario usuario, List<ListaEndereco> listaEnderecos, List<ListaUsuario> listaUsuarios) {
+        var usuarioDto = new ListaUsuario(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getCpf(),
+//                    usuario.getCelular(),
+                usuario.getSenha(),
+                listaEnderecos
+        );
+        listaUsuarios.add(usuarioDto);
+    }
+
+    private static void criarDtoEndereco(Usuario usuario, List<ListaEndereco> listaEnderecos) {
+        for (Endereco endereco : usuario.getEnderecos()) {
+            var enderecoDto = new ListaEndereco(
+                    endereco.getId(),
+                    endereco.getLogradouro(),
+                    endereco.getNumero(),
+                    endereco.getComplemento(),
+                    endereco.getEstado(),
+                    endereco.getCidade()
+            );
+            listaEnderecos.add(enderecoDto);
+        }
     }
 
     public void cadastrar(UsuarioCriacaoDto usuarioCriacaoDto) {
@@ -82,6 +86,7 @@ public class UsuarioServices {
     public UsuarioTokenDto autenticar(UsuarioLoginDto usuarioLoginDto) {
         final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(
                 usuarioLoginDto.getEmail(), usuarioLoginDto.getSenha());
+
         final Authentication authentication = this.authenticationManager.authenticate(credentials);
 
         Usuario usuarioAutenticado =
@@ -93,44 +98,25 @@ public class UsuarioServices {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         final String jwtToken = gerenciadorTokenJwt.generateToken(authentication);
-        var token = Token.builder()
-                .usuario(usuarioAutenticado)
-                .token(jwtToken)
-                .tokenType(TokenType.BEARER)
-                .revoked(false)
-                .expired(false)
-                .build();
-        revokeAllUserTokens(usuarioAutenticado);
-        tokenRepository.save(token);
 
-        return UsuarioMapper.of(usuarioAutenticado, token.getToken());
+        return UsuarioMapper.of(usuarioAutenticado, jwtToken);
     }
 
-    private void revokeAllUserTokens(Usuario usuario) {
-        var validTokens = tokenRepository.findAllValidTokensByUsuarioId(usuario.getId());
-        if (validTokens.isEmpty())
-            return;
-        validTokens.forEach(t -> {
-            t.setExpired(true);
-            t.setRevoked(true);
-        });
-        tokenRepository.saveAll(validTokens);
-    }
 
     public ListaUsuarioAtualizacao atualizar(Integer id, Usuario dados) {
         var usuario = repository.findById(id);
-        if (usuario.isPresent()){
+        if (usuario.isPresent()) {
             usuario.get().setNome(dados.getNome());
             usuario.get().setEmail(dados.getEmail());
             usuario.get().setCpf(dados.getCpf());
-            usuario.get().setCelular(dados.getCelular());
+//            usuario.get().setCelular(dados.getCelular());
             usuario.get().setSenha(dados.getSenha());
             ListaUsuarioAtualizacao usuarioDto = new ListaUsuarioAtualizacao(
                     usuario.get().getId(),
                     usuario.get().getNome(),
                     usuario.get().getEmail(),
                     usuario.get().getCpf(),
-                    usuario.get().getCelular(),
+//                    usuario.get().getCelular(),
                     usuario.get().getSenha()
             );
             repository.save(usuario.get());
@@ -151,32 +137,23 @@ public class UsuarioServices {
         if (usuario.isEmpty()) {
             throw new ValidacaoException("Usuário não existe!");
         }
-            List<ListaEndereco> listaEnderecos = new ArrayList<>();
-            for(Endereco endereco : usuario.get().getEnderecos()){
-                var enderecoDto = new ListaEndereco(
-                        endereco.getId(),
-                        endereco.getLogradouro(),
-                        endereco.getNumero(),
-                        endereco.getComplemento(),
-                        endereco.getEstado(),
-                        endereco.getCidade()
-                );
-                listaEnderecos.add(enderecoDto);
-            }
-            ListaUsuario usuarioDto = new ListaUsuario(
-                    usuario.get().getId(),
-                    usuario.get().getNome(),
-                    usuario.get().getEmail(),
-                    usuario.get().getCpf(),
-                    usuario.get().getCelular(),
-                    usuario.get().getSenha(),
-                    listaEnderecos
-            );
+        List<ListaEndereco> listaEnderecos = new ArrayList<>();
+        criarDtoEndereco(usuario.get(), listaEnderecos);
+        ListaUsuario usuarioDto = criarDtoUsuario(usuario, listaEnderecos);
         return usuarioDto;
     }
 
-    public Token recuperarToken(String jwtToken) {
-        return tokenRepository.findByToken(jwtToken)
-                .orElseThrow(() -> new ResponseStatusException(404, "Token não encontrado", null));
+    private static ListaUsuario criarDtoUsuario(Optional<Usuario> usuario, List<ListaEndereco> listaEnderecos) {
+        ListaUsuario usuarioDto = new ListaUsuario(
+                usuario.get().getId(),
+                usuario.get().getNome(),
+                usuario.get().getEmail(),
+                usuario.get().getCpf(),
+//                    usuario.get().getCelular(),
+                usuario.get().getSenha(),
+                listaEnderecos
+        );
+        return usuarioDto;
     }
+
 }

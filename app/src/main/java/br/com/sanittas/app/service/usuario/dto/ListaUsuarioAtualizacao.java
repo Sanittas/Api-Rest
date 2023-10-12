@@ -5,7 +5,6 @@ public record ListaUsuarioAtualizacao(
         String nome,
         String email,
         String cpf,
-        String celular,
         String senha
 ) {
 }

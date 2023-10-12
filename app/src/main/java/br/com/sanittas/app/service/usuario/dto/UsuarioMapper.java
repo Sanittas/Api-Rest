@@ -12,7 +12,7 @@ public class UsuarioMapper {
         usuario.setEmail(usuarioCriacaoDto.getEmail());
         usuario.setSenha(usuarioCriacaoDto.getSenha());
         usuario.setCpf(usuarioCriacaoDto.getCpf());
-        usuario.setCelular(usuarioCriacaoDto.getCelular());
+//        usuario.setCelular(usuarioCriacaoDto.getCelular());
 
         return usuario;
     }

@@ -9,7 +9,6 @@ public record ListaUsuario(
         String nome,
         String email,
         String cpf,
-        String celular,
         String senha,
         List<ListaEndereco> enderecos
 ) {
