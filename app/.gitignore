@@ -9,7 +9,6 @@ build/
 
 # Arquivos de dependência
 .mvn/
-repository/
 # Se você estiver usando Maven Wrapper (mvnw)
 !/.mvn/wrapper/maven-wrapper.jar
 
