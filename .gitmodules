@@ -1,0 +1,6 @@
+[submodule "CRUD-Usuario"]
+	path = CRUD-Usuario
+	url = https://github.com/Sanittas/CRUD-Usuario.git
+[submodule "CRUD-Empresa"]
+	path = CRUD-Empresa
+	url = https://github.com/Sanittas/CRUD-Empresa.git
