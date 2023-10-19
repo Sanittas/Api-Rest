@@ -1,5 +1,3 @@
-[submodule "sannitas-web"]
-	path = sannitas-web
 [submodule "CRUD-Usuario"]
 	path = CRUD-Usuario
 	url = https://github.com/Sanittas/CRUD-Usuario.git
