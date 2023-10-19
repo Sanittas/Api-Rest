@@ -1,0 +1,3 @@
+[submodule "sannitas-web"]
+	path = sannitas-web
+	url = https://github.com/Sanittas/sannitas-web.git
