@@ -1,9 +1,9 @@
 [submodule "CRUD-Usuario"]
 	path = CRUD-Usuario
 	url = https://github.com/Sanittas/CRUD-Usuario.git
-[submodule "CRUD-Empresa"]
-	path = CRUD-Empresa
-	url = https://github.com/Sanittas/CRUD-Empresa.git
 [submodule "sannitas-web"]
 	path = sannitas-web
 	url = https://github.com/Sanittas/sannitas-web.git
+[submodule "Servico-empresa"]
+	path = Servico-empresa
+	url = https://github.com/Sanittas/Servico-empresa.git
