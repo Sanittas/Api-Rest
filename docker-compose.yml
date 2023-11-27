@@ -1,33 +1,56 @@
 version: '3.7'
-networks:
-    sannitas:
-        driver: bridge
 services:
+    db:
+        image: mysql
+        container_name: mysql-container
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_DATABASE=sanittas
+        command: --default-authentication-plugin=caching_sha2_password
+        volumes:
+            - ./db/data:/var/lib/mysql
+        restart: always
+        ports:
+            - 3306:3306
+        networks:
+            - sanittas
+        healthcheck:
+            test: [ "CMD-SHELL", "mysqladmin ping -hlocalhost -uroot -proot"]
+            timeout: 60s
+            retries: 10
     web:
         build: "/sannitas-web"
         container_name: sannitas-web
-        restart: always
-        networks:
-            - sannitas
+        restart: on-failure
         ports:
             - "80:3000"
+        networks:
+            - sanittas
         depends_on:
             - crud-usuarios
             - crud-empresas
     crud-usuarios:
-      build: "/CRUD-Usuario"
-      container_name: crud-usuarios
-      networks:
-        - sannitas
-      restart: always
-      ports:
-        - "8001:8080"
+        build: "/CRUD-Usuario"
+        container_name: crud-usuarios
+        restart: on-failure
+        ports:
+            - "8001:8080"
+        networks:
+            - sanittas
+        depends_on:
+            db:
+                condition: service_healthy
     crud-empresas:
         build: "/Servico-empresa"
         container_name: crud-empresas
-        networks:
-            - sannitas
-        restart: always
+        restart: on-failure
         ports:
             - "8002:8080"
-        
+        networks:
+            - sanittas
+        depends_on:
+            db:
+                condition: service_healthy
+networks:
+    sanittas:
+        driver: bridge
