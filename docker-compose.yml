@@ -4,9 +4,8 @@ services:
         image: mysql
         container_name: mysql-container
         environment:
-            - MYSQL_ROOT_PASSWORD=root
-            - MYSQL_DATABASE=sanittas
-        command: --default-authentication-plugin=caching_sha2_password
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: sanittas
         volumes:
             - ./db/data:/var/lib/mysql
         restart: always
