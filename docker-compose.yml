@@ -17,17 +17,6 @@ services:
             test: [ "CMD-SHELL", "mysqladmin ping -hlocalhost -uroot -proot"]
             timeout: 60s
             retries: 10
-    web:
-        build: "/sannitas-web"
-        container_name: sannitas-web
-        restart: on-failure
-        ports:
-            - "80:3000"
-        networks:
-            - sanittas
-        depends_on:
-            - crud-usuarios
-            - crud-empresas
     crud-usuarios:
         build: "/CRUD-Usuario"
         container_name: crud-usuarios
