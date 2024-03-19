@@ -18,7 +18,7 @@ services:
             timeout: 60s
             retries: 10
     crud-usuarios:
-        build: "/CRUD-Usuario/"
+        build: "CRUD-Usuario/"
         container_name: crud-usuarios
         restart: on-failure
         ports:
@@ -29,7 +29,7 @@ services:
             db:
                 condition: service_healthy
     crud-empresas:
-        build: "/Servico-empresa/"
+        build: "Servico-empresa/"
         container_name: crud-empresas
         restart: on-failure
         ports:
