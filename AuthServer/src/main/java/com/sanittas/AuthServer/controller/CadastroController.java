@@ -22,7 +22,7 @@ public class CadastroController {
     private final EmpresaService empresaService;
 
     @PostMapping("/empresa/")
-    public ResponseEntity<LoginDtoResponse> cadastroUsuario(@RequestBody @Valid EmpresaCriacaoDto empresa) {
+    public ResponseEntity<LoginDtoResponse> cadastroEmpresa(@RequestBody @Valid EmpresaCriacaoDto empresa) {
         try {
             log.info("Recebida solicitação para cadastrar uma nova empresa: {}", empresa.razaoSocial());
             empresaService.cadastrar(empresa);
@@ -35,10 +35,10 @@ public class CadastroController {
     }
 
     @PostMapping("/usuario/")
-    public ResponseEntity<Usuario> cadastrar(@RequestBody @Valid UsuarioCriacaoDto dados) {
+    public ResponseEntity<?> cadastroUsuario(@RequestBody @Valid UsuarioCriacaoDto dados) {
         try {
-            Usuario response = usuarioService.cadastrar(dados);
-            return ResponseEntity.status(201).body(response); // Criado com sucesso
+            usuarioService.cadastrar(dados);
+            return ResponseEntity.status(201).build(); // Criado com sucesso
         } catch (ResponseStatusException e) {
             throw new ResponseStatusException(e.getStatusCode());
         }
