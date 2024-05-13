@@ -12,7 +12,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @AllArgsConstructor
-@CrossOrigin(origins = "*")
 public class AuthController {
     private final UsuarioService usuarioService;
     private final EmpresaService empresaService;

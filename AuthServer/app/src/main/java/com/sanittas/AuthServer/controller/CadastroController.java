@@ -14,7 +14,6 @@ import org.springframework.web.server.ResponseStatusException;
 @AllArgsConstructor
 @Slf4j
 @RequestMapping("/cadastrar")
-@CrossOrigin(origins = "*")
 public class CadastroController {
     private final UsuarioService usuarioService;
     private final EmpresaService empresaService;
